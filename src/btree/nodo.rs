@@ -13,8 +13,13 @@ pub enum Next {
     Nodo(Rc<RefCell<Nodo>>)
 }
 
-impl Nodo {
+macro_rules! new_nodo {
+    ( $v: expr ) => {
+        Next::Nodo(Rc::new(RefCell::new(Nodo::new($v))))
+    };
+}
 
+impl Nodo {
     pub fn new(val: i32) -> Self {
         Nodo{
             val,
@@ -47,14 +52,14 @@ impl Nodo {
                 match &self.sx {
                     Next::Nodo(n) => n.borrow_mut().add(val),
                     Next::None => {
-                        self.sx = Next::Nodo(Rc::new(RefCell::new(Nodo::new(val))));
+                        self.sx = new_nodo!(val);
                     }
                 }
             } else {
                 match &self.dx {
                     Next::Nodo(n) => n.borrow_mut().add(val),
                     Next::None => {
-                        self.dx = Next::Nodo(Rc::new(RefCell::new(Nodo::new(val))));
+                        self.dx = new_nodo!(val);
                     }
                 }
             }
@@ -75,5 +80,34 @@ impl Nodo {
         };
 
         return act;
+    }
+
+    pub(super) fn insert_balanced(&mut self, v: &[i32]) {
+        let l =  v.len();
+        if l > 0 {
+            if l == 1 {
+                self.val = v[0];
+            } else if l == 2 {
+                self.val = v[1];
+                self.sx =  new_nodo!(v[0]);
+            } else if l == 3 {
+                self.sx = new_nodo!(v[0]);
+                self.val = v[1];
+                self.dx = new_nodo!(v[2]);
+            } else {
+                let mid = l / 2;
+                self.sx = new_nodo!(0);
+                match &self.sx {
+                    &Next::None => (),
+                    Next::Nodo(n) => n.borrow_mut().insert_balanced(&v[..mid])
+                }
+                self.val = v[mid];
+                self.dx = new_nodo!(0);
+                match &self.dx {
+                    &Next::None => (),
+                    Next::Nodo(n) => n.borrow_mut().insert_balanced(&v[mid + 1..])
+                }
+            }
+        }
     }
 }

@@ -25,6 +25,12 @@ impl BTree {
     pub fn to_vec(&self) -> Vec<i32> {
         self.head.borrow().to_vec(vec![])
     }
+
+    pub fn balance(&mut self) {
+        let asvec = self.to_vec();
+        self.head = Rc::new(RefCell::new(Nodo::new(0)));
+        self.head.borrow_mut().insert_balanced(&asvec[..]);
+    }
 }
 
 impl From<BTree> for Vec<i32> {

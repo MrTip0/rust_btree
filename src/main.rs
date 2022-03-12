@@ -33,17 +33,16 @@ macro_rules! print_vec {
 }
 
 fn main() {
-    stampa("Inserisci un numero: ");
-
     let mut fir = 0;
 
     let mut connum = true;
     while connum {
+        stampa("Inserisci un numero: ");
         connum = false;
         let n = numero();
         match n {
             Some(num) => fir = num,
-            None => {println!("Inserimento non valido"); connum = true}
+            None => { println!("Inserimento non valido"); connum = true }
         };
     }
 
@@ -57,6 +56,8 @@ fn main() {
             None => { println!("Fine numeri"); break; }
         };
     }
+
+    tree.balance();
 
     let asv: Vec<i32> = tree.clone().into();
 

@@ -3,38 +3,73 @@ use std::{rc::Rc, cell::RefCell};
 use super::nodo::Nodo;
 
 #[derive(Clone, Debug)]
-pub struct BTree {
-    head: Rc<RefCell<Nodo>>
+pub struct BTree<T: Ord + Eq + Clone> {
+    head: Option<Rc<RefCell<Nodo<T>>>>
 }
 
-impl BTree {
-    pub fn new(val: i32) -> Self {
+impl<T: Ord + Eq + Clone> BTree<T>{
+    pub fn new(val: T) -> Self {
         BTree {
-            head: Rc::new(RefCell::new(Nodo::new(val)))
+            head: Some(Rc::new(RefCell::new(Nodo::new(val))))
         }
     }
 
-    pub fn add(&mut self, val: i32) {
-        self.head.borrow_mut().add(val)
+    pub fn empty() -> Self {
+        BTree {
+            head: None
+        }
     }
 
-    pub fn find(&self, val: i32) -> bool {
-        self.head.borrow().find(val)
+    pub fn add(&mut self, val: T) {
+        match &self.head {
+            Some(n) => n.borrow_mut().add(val),
+            None => self.head = Some(Rc::new(RefCell::new(Nodo::new(val))))
+        };
     }
 
-    pub fn to_vec(&self) -> Vec<i32> {
-        self.head.borrow().to_vec(vec![])
+    pub fn find(&self, val: T) -> bool {
+        match &self.head {
+            Some(n) => n.borrow().find(val),
+            None => false
+        }
+    }
+
+    pub fn to_vec(&self) -> Vec<T> {
+        match &self.head {
+            Some(n) => n.borrow().to_vec(vec![]),
+            None => vec![]
+        }
     }
 
     pub fn balance(&mut self) {
         let asvec = self.to_vec();
-        self.head = Rc::new(RefCell::new(Nodo::new(0)));
-        self.head.borrow_mut().insert_balanced(&asvec[..]);
+        if asvec.len() == 0 {
+            self.head = None;
+        } else {
+            self.head = Some(Rc::new(RefCell::new(Nodo::new(asvec[0].clone()))));
+            match &self.head {
+                Some(n) => n.borrow_mut().insert_balanced(&asvec[..]),
+                None => ()
+            };
+        }
     }
 }
 
-impl From<BTree> for Vec<i32> {
-    fn from(tree: BTree) -> Self {
+impl<T: Ord + Eq + Clone> From<BTree<T>> for Vec<T> {
+    fn from(tree: BTree<T>) -> Self {
         tree.to_vec()
     }
+}
+
+#[macro_export]
+macro_rules! btree {
+    ( $( $x: tt ),*) => {
+        {
+            let mut t_tree = BTree::empty();
+            $(
+                t_tree.add($x);
+            )*
+            t_tree
+        }
+    };
 }

@@ -3,7 +3,7 @@ pub mod btree;
 
 mod tests {
     #[allow(unused_imports)]
-    use crate::BTree;
+    use crate::{BTree, btree};
 
     #[test]
     fn create_empty() {
@@ -52,6 +52,13 @@ mod tests {
         tree.add(5);
         tree.balance();
         let v: Vec<i32> = vec![1, 2, 3, 4, 5, 6];
+        assert_eq!(v, tree.to_vec());
+    }
+
+    #[test]
+    fn create_by_macro() {
+        let tree = btree![53, 12, 45, 123, 56];
+        let v: Vec<i32> = vec![12, 45, 53, 56, 123];
         assert_eq!(v, tree.to_vec());
     }
 }

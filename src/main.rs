@@ -33,20 +33,7 @@ macro_rules! print_vec {
 }
 
 fn main() {
-    let mut fir = 0;
-
-    let mut connum = true;
-    while connum {
-        stampa("Inserisci un numero: ");
-        connum = false;
-        let n = numero();
-        match n {
-            Some(num) => fir = num,
-            None => { println!("Inserimento non valido"); connum = true }
-        };
-    }
-
-    let mut tree = BTree::new(fir);
+    let mut tree = BTree::empty();
 
     loop {
         stampa("Inserisci un numero: ");
@@ -59,7 +46,7 @@ fn main() {
 
     tree.balance();
 
-    let asv: Vec<i32> = tree.clone().into();
+    let asv = Vec::from(tree.clone());
 
     print_vec!(asv);
 

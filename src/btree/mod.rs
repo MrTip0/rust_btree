@@ -2,7 +2,8 @@ mod nodo;
 pub mod btree;
 
 mod tests {
-    use super::btree::BTree;
+    #[allow(unused_imports)]
+    use crate::BTree;
 
     #[test]
     fn create_empty() {
